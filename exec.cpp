@@ -487,7 +487,16 @@ static void do_builtin_io( const char *out, const char *err )
 		if (write_loop(STDOUT_FILENO, out, len) == -1)
 		{
 			debug( 0, L"Error while writing to stdout" );
+#if 0
+			/* For some reason, a couple of times a day this
+			 * wperror causes pthreads to call the futex system
+			 * call with an invalid op (0xef), which returns
+			 * -ENOSYS. pthreads then loops like mad retrying the
+			 * system call until it succeeds (which of course it
+			 * never does), resulting in 100% CPU use.
+			 */
 			wperror( L"write_loop" );
+#endif
 			show_stackframe();
 		}
 	}
